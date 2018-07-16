@@ -1,0 +1,84 @@
+﻿@using DodgeOrSmash.Models
+@model DodgeOrSmash.Models.ApplicationUser
+@using Microsoft.AspNet.Identity;
+@using Microsoft.AspNet.Identity.Owin;
+@using System.Linq;
+@{
+	ApplicationDbContext db = new ApplicationDbContext();
+}
+
+<!DOCTYPE html>
+<html>
+<body>
+	<div id="informacoes" class="container">
+		<button onclick="doPlay();">PLAY!</button>
+		@using (Html.BeginForm("UpdateScore", "Play", FormMethod.Post, new { role = "form", @id = "scoreForm" }))
+		{
+			<h1>
+				Last Score
+			</h1>
+			<h1>
+				@Html.TextBoxFor(m => m.HighestScore, new { type = "number", @readonly = true })
+			</h1>
+		}
+	</div>
+	<div id="contentor">
+
+	</div>
+	<script src="/assets/js/jquery.min.js"></script>
+	<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+	<script src="/assets/js/bs-animation.js"></script>
+	<script src="/assets/js/dodgeOrSmash.js"></script>
+	<script>
+		var aJogo = null;
+        var imss = [
+            { image: 'assets/img/skins/chorico.png', bonusHit: 500, bonusJump: 100, prob: 2 / 10 },
+            { image: 'assets/img/skins/queiroz.png', bonusHit: 0, bonusJump: 100, prob: 7 / 10 },
+            { image: 'assets/img/skins/casimiro.png', bonusHit: 0, bonusJump: 100, prob: 7 / 10 },
+            { image: 'assets/img/skins/luisAlmeida.png', bonusHit: 0, bonusJump: 100, prob: 7 / 10 },
+            { image: 'assets/img/skins/luisOliveira.png', bonusHit: 0, bonusJump: 100, prob: 7 / 10 },
+            { image: 'assets/img/skins/ramos.png', bonusHit: 0, bonusJump: 100, prob: 7 / 10 }
+        ];
+
+
+		function doPlay(){
+            if (aJogo != null) return;
+            aJogo = new dodgeOrSmash("assets/img/skins/@ViewBag.skin.ToString()"+".png", imss, 660, 555, 60, "#FFFFFF");
+			document.getElementById("contentor").innerHTML="";
+			document.getElementById("contentor").appendChild(aJogo.getCanvas());
+			aJogo.start();
+			aJogo.addEventListener("gameend", gameend);
+		}
+
+		function gameend(pontos) {
+
+            document.getElementById("HighestScore").value = aJogo.getScore();
+
+			@if (User.Identity.IsAuthenticated)
+			{
+				<text>
+				if (document.getElementById("HighestScore").value != null)
+				{
+					scoreForm.submit();
+				}</text>
+			}
+
+
+			aJogo=null;
+		}
+
+		$(document).ready(function () {
+			debugger;
+			@if (User.Identity.IsAuthenticated)
+			{
+				var userId = User.Identity.GetUserId();
+				<text>
+					document.getElementById("HighestScore").value = @db.Users.FirstOrDefault(u => u.Id == userId).HighestScore;
+				</text>
+			}
+		});
+
+	</script>
+</body>
+
+</html>

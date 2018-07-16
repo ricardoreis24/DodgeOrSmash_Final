@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNet.Identity
+@using DodgeOrSmash.Models;
+@{
+    ApplicationDbContext db = new ApplicationDbContext();
+    var userId = User.Identity.GetUserId();
+}
+@if (User.Identity.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "! You have: " + db.Users.Where(u => u.Id == userId).FirstOrDefault().Wallet +" points! (Click to manage)", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            </li>
+            <li><a href="javascript:document.getElementById('logoutForm').submit()">Log Out</a></li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

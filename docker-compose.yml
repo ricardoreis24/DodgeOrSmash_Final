@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  dodgeorsmash:
+    image: ${DOCKER_REGISTRY}dodgeorsmash
+    build:
+      context: .\DodgeOrSmash
+      dockerfile: Dockerfile

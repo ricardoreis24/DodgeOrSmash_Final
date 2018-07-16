@@ -1,0 +1,64 @@
+﻿@using System.Data.Entity
+@using DodgeOrSmash.Models
+@using Microsoft.AspNet.Identity
+@using Microsoft.Owin.Security;
+
+@model DodgeOrSmash.Models.IndexViewModel
+@{
+	ViewBag.Title = "Manage";
+	ApplicationDbContext db = new ApplicationDbContext();
+
+}
+
+<h2>@ViewBag.Title.</h2>
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+<div>
+	<h4>Change your account settings</h4>
+	<hr />
+
+
+	<dl class="dl-horizontal">
+		<dt>Wallet:</dt>
+		<dd>@Model.Wallet points</dd>
+		<dt>Highest Score:</dt>
+		<dd>@Model.HighestScore</dd>
+		<dt>Password:</dt>
+		<dd>
+			[
+			@if (Model.HasPassword)
+			{
+				@Html.ActionLink("Change your password", "ChangePassword")
+			}
+			else
+			{
+				@Html.ActionLink("Create", "SetPassword")
+			}
+			]
+		</dd>
+	</dl>
+	@if (User.IsInRole("Admin"))
+	{
+		<dl>
+			@foreach (ApplicationUser user in db.Users.ToList())
+			{
+
+				<dt>
+					@{
+						var roleId = user.Roles.FirstOrDefault().RoleId;
+						var role = db.Roles.FirstOrDefault(r => r.Id == roleId).Name;
+					}
+					@user.UserName - @role
+				</dt>
+				<dd>
+					@using (Html.BeginForm("UpdateRole", "Manage", FormMethod.Post, new { role = "form", @id = "update" }))
+					{
+						<input type="hidden" name="id" id="id" value="@user.Id" />
+						<div class="d-flex card-footer"><button class="btn btn-outline-dark btn-sm ml-auto" type="submit"><i class="fa fa-plus"></i>&nbsp;Change Role</button></div>
+					}
+				</dd>
+			}
+		</dl>
+	}
+
+</div>
